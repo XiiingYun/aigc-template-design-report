@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>周星芸 | AIGC EFFECT DESIGN MONTHLY SHOWCASE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+  --acid: #DFFF00;
+  --acid-soft: #E8FF5C;
+  --bg: #F5F5F0;
+  --bg-warm: #FAFAF5;
+  --text: #0A0A0F;
+  --text-dim: #555555;
+  --text-light: #999999;
+  --glass-border: rgba(255,255,255,0.4);
+  --glass-bg: rgba(255,255,255,0.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Noto Sans SC',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  line-height:1.7;
+}
+
+/* ===== LOADER ===== */
+#loader {
+  position:fixed; inset:0; background:#fff; z-index:9999;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transition:opacity 1s ease, visibility 1s;
+}
+#loader.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+.loader-blob {
+  width:100px; height:100px;
+  background:linear-gradient(135deg, rgba(223,255,0,0.3), rgba(192,192,192,0.15));
+  border-radius:60% 40% 30% 70% / 60% 30% 70% 40%;
+  animation:loaderMorph 3s ease-in-out infinite;
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(223,255,0,0.3);
+  margin-bottom:24px;
+}
+@keyframes loaderMorph {
+  0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%;transform:rotate(0)}
+  50%{border-radius:30% 60% 70% 40%/50% 60% 30% 60%;transform:rotate(180deg)}
+}
+.loader-text {
+  font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:4px; color:var(--text-light);
+}
+
+/* ===== NAV ===== */
+.nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  padding:20px 40px; display:flex; justify-content:space-between; align-items:center;
+  background:linear-gradient(180deg,rgba(255,255,255,0.95) 0%,transparent 100%);
+  backdrop-filter:blur(12px); transition:all 0.4s;
+}
+.nav.scrolled { background:rgba(255,255,255,0.98); box-shadow:0 1px 20px rgba(0,0,0,0.04); }
+.nav-left { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--text-light); }
+.nav-left span { color:var(--text); font-weight:700; }
+.nav-right { display:flex; gap:28px; }
+.nav-right a {
+  font-size:12px; color:var(--text-dim); text-decoration:none; letter-spacing:1px;
+  font-family:'JetBrains Mono',monospace; transition:color 0.3s; position:relative;
+}
+.nav-right a::after {
+  content:''; position:absolute; bottom:-4px; left:0; width:0; height:1px;
+  background:var(--acid); transition:width 0.3s;
+}
+.nav-right a:hover { color:var(--text); }
+.nav-right a:hover::after { width:100%; }
+
+/* ===== HERO ===== */
+.hero {
+  position:relative; width:100%; min-height:100vh; overflow:hidden;
+  display:flex; align-items:center;
+  background:url('images/hero-bg.png') center center / cover no-repeat #FAFAF8;
+}
+.hero::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg, rgba(250,250,248,0.97) 0%, rgba(250,250,248,0.85) 35%, rgba(250,250,248,0.2) 55%, transparent 70%);
+  z-index:1;
+}
+.hero-content-wrap {
+  position:relative; z-index:3;
+  max-width:1400px; width:100%; margin:0 auto;
+  padding:120px 60px 100px;
+}
+.hero h1 {
+  font-size:clamp(34px,4.5vw,60px); font-weight:900; line-height:1.08; letter-spacing:-1.5px;
+  margin-bottom:16px; color:var(--text);
+}
+.hero-sub {
+  font-size:15px; color:var(--text-dim); margin-bottom:6px; line-height:1.8;
+}
+.hero-date {
+  font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-light);
+  letter-spacing:1px; margin-bottom:40px;
+}
+.hero-name {
+  font-size:20px; font-weight:700; margin-bottom:6px; letter-spacing:2px;
+}
+.hero-role {
+  font-size:13px; color:var(--text-dim); margin-bottom:36px;
+}
+.enter-btn {
+  display:inline-flex; align-items:center; gap:12px;
+  padding:14px 40px; background:var(--text); color:#fff;
+  font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:2px;
+  text-decoration:none; border:none; cursor:pointer; transition:all 0.4s;
+}
+.enter-btn:hover { background:#333; }
+.enter-btn .arrow { transition:transform 0.3s; }
+.enter-btn:hover .arrow { transform:translateX(4px); }
+.hero-footer {
+  position:absolute; bottom:24px; left:60px; right:60px;
+  display:flex; justify-content:space-between; z-index:3;
+  font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-light);
+  letter-spacing:1px;
+}
+
+
+
+/* ===== SECTIONS ===== */
+.section { position:relative; padding:100px 60px; max-width:1400px; margin:0 auto; }
+.sec-header { margin-bottom:64px; }
+.sec-label {
+  font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:3px; color:var(--text-light);
+  margin-bottom:12px; display:flex; align-items:center; gap:12px;
+}
+.sec-label::before { content:''; width:32px; height:1px; background:var(--acid); }
+.sec-title { font-size:clamp(28px,4vw,48px); font-weight:900; line-height:1.2; letter-spacing:-1px; margin-bottom:16px; }
+.sec-desc { font-size:15px; color:var(--text-dim); max-width:640px; line-height:1.9; }
+
+/* ===== OVERVIEW ===== */
+.overview-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.overview-card {
+  background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:24px; padding:48px;
+  cursor:pointer; transition:all 0.4s ease; position:relative; overflow:hidden;
+}
+.overview-card:hover { transform:translateY(-4px); box-shadow:0 24px 60px rgba(0,0,0,0.06); border-color:rgba(223,255,0,0.3); }
+.overview-card .oc-num {
+  font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--acid); background:var(--text);
+  display:inline-block; padding:6px 14px; border-radius:8px; margin-bottom:20px;
+}
+.overview-card h3 { font-size:22px; font-weight:700; margin-bottom:12px; }
+.overview-card p { font-size:14px; color:var(--text-dim); line-height:1.9; }
+.overview-card .oc-tags { margin-top:20px; display:flex; flex-wrap:wrap; gap:8px; }
+.overview-card .oc-tags span {
+  font-size:11px; font-family:'JetBrains Mono',monospace; padding:4px 12px;
+  border-radius:6px; background:rgba(223,255,0,0.08); color:var(--text-dim); border:1px solid rgba(223,255,0,0.15);
+}
+
+/* ===== PROBLEM ===== */
+.problem-core {
+  background:linear-gradient(135deg, var(--acid-soft) 0%, var(--acid) 100%);
+  border-radius:24px; padding:48px 40px; text-align:center; margin:48px 0;
+}
+.problem-core h3 { font-size:clamp(20px,3vw,32px); font-weight:900; line-height:1.4; }
+.problem-core p { font-size:14px; color:var(--text-dim); margin-top:12px; }
+.dual-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.dual-card {
+  background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:20px; padding:40px;
+  transition:all 0.4s;
+}
+.dual-card:hover { border-color:rgba(223,255,0,0.3); box-shadow:0 16px 40px rgba(0,0,0,0.05); }
+.dual-card .dc-tag {
+  font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:2px;
+  padding:6px 14px; border-radius:8px; background:rgba(0,0,0,0.03); display:inline-block; margin-bottom:16px;
+}
+.dual-card h4 { font-size:18px; margin-bottom:12px; }
+.dual-card p { font-size:14px; color:var(--text-dim); line-height:1.9; }
+.dual-card ul { margin-top:16px; list-style:none; }
+.dual-card ul li { font-size:13px; color:var(--text-dim); padding:6px 0; padding-left:20px; position:relative; }
+.dual-card ul li::before { content:'→'; position:absolute; left:0; color:var(--acid); }
+
+/* ===== MATRIX ===== */
+.matrix-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+.matrix-card {
+  background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:20px; padding:36px 28px;
+  cursor:pointer; transition:all 0.4s; position:relative; overflow:hidden;
+}
+.matrix-card:hover { transform:translateY(-4px); box-shadow:0 20px 50px rgba(0,0,0,0.06); border-color:rgba(223,255,0,0.3); }
+.matrix-card .mc-num {
+  font-family:'JetBrains Mono',monospace; font-size:48px; font-weight:700;
+  color:rgba(223,255,0,0.2); line-height:1; margin-bottom:16px;
+}
+.matrix-card:hover .mc-num { color:var(--acid); }
+.matrix-card h4 { font-size:16px; margin-bottom:10px; }
+.matrix-card p { font-size:13px; color:var(--text-dim); line-height:1.8; }
+.matrix-detail {
+  background:var(--bg-warm); border-radius:12px; margin-top:16px;
+}
+.matrix-detail-inner { padding:20px; font-size:13px; color:var(--text-dim); line-height:1.9; }
+
+/* ===== WORKFLOW ===== */
+.workflow-timeline {
+  display:flex; gap:0; position:relative; padding-top:40px; overflow-x:auto;
+}
+.workflow-timeline::before {
+  content:''; position:absolute; top:52px; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, var(--acid) 0%, rgba(223,255,0,0.1) 100%);
+}
+.workflow-step {
+  flex:1; min-width:220px; position:relative; padding:32px 20px 0;
+}
+.workflow-step::before {
+  content:''; position:absolute; top:-28px; left:50%; transform:translateX(-50%);
+  width:24px; height:24px; background:#fff; border:3px solid var(--acid);
+  border-radius:50%; box-shadow:0 0 0 4px rgba(223,255,0,0.15);
+}
+.workflow-step .ws-num {
+  font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--acid); background:var(--text);
+  display:inline-block; padding:4px 12px; border-radius:6px; margin-bottom:12px;
+}
+.workflow-step h4 { font-size:16px; margin-bottom:8px; }
+.workflow-step p { font-size:13px; color:var(--text-dim); line-height:1.8; max-width:none; }
+.workflow-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.workflow-tags span {
+  font-size:11px; font-family:'JetBrains Mono',monospace; padding:4px 12px;
+  border-radius:6px; background:rgba(0,0,0,0.03); color:var(--text-dim); border:1px solid rgba(0,0,0,0.06);
+}
+
+/* ===== GALLERY ===== */
+.gallery-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+.gallery-card {
+  background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:20px; overflow:hidden;
+  cursor:pointer; transition:all 0.4s; position:relative;
+}
+.gallery-card:hover { transform:translateY(-4px); box-shadow:0 20px 50px rgba(0,0,0,0.08); border-color:rgba(223,255,0,0.3); }
+.gallery-card .gal-img { aspect-ratio:3/4; overflow:hidden; position:relative; }
+.gallery-card .gal-img img { width:100%; height:100%; object-fit:cover; transition:transform 0.6s; }
+.gallery-card:hover .gal-img img { transform:scale(1.05); }
+.gallery-card .gal-info { padding:24px; }
+.gallery-card .gal-name { font-size:16px; font-weight:700; margin-bottom:4px; }
+.gallery-card .gal-count { font-size:12px; color:var(--text-light); font-family:'JetBrains Mono',monospace; }
+.gallery-card .gal-badge {
+  position:absolute; top:12px; left:12px; background:var(--acid); color:var(--text);
+  font-size:10px; font-weight:700; padding:4px 10px; border-radius:6px; font-family:'JetBrains Mono',monospace;
+}
+
+.gallery-card .gal-expand-hint {
+  position:absolute; bottom:12px; right:12px;
+  background:rgba(0,0,0,0.6); color:#fff; border-radius:20px;
+  padding:6px 14px; font-size:11px; display:flex; align-items:center; gap:4px;
+  font-family:'JetBrains Mono',monospace; backdrop-filter:blur(4px);
+  opacity:0.8; transition:opacity 0.3s;
+}
+.gallery-card:hover .gal-expand-hint { opacity:1; }
+
+.gallery-detail {
+  max-height:0; overflow:hidden; transition:max-height 0.8s cubic-bezier(0.16,1,0.3,1);
+  background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:20px; margin-top:20px;
+}
+.gallery-detail.open { max-height:4000px; }
+.gallery-detail-inner { padding:40px; }
+.gallery-detail-inner h4 { font-size:18px; margin-bottom:20px; }
+.img-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px;
+}
+.img-item {
+  aspect-ratio:3/4; border-radius:12px; overflow:hidden; background:var(--bg-warm);
+  border:1px solid rgba(0,0,0,0.06); cursor:pointer; transition:all 0.4s; position:relative;
+}
+.img-item img { width:100%; height:100%; object-fit:cover; transition:transform 0.6s; }
+.img-item:hover { transform:translateY(-4px) scale(1.02); box-shadow:0 16px 40px rgba(0,0,0,0.08); }
+.img-item:hover img { transform:scale(1.08); }
+.img-item .img-overlay {
+  position:absolute; bottom:0; left:0; right:0; padding:16px 12px 12px;
+  background:linear-gradient(transparent,rgba(0,0,0,0.6)); opacity:0; transition:opacity 0.3s;
+}
+.img-item:hover .img-overlay { opacity:1; }
+.img-item .img-overlay span { font-size:11px; color:#fff; font-weight:500; }
+
+.load-more {
+  display:inline-flex; align-items:center; gap:8px; margin-top:24px;
+  padding:12px 28px; border-radius:100px; border:1px solid rgba(0,0,0,0.08);
+  background:transparent; color:var(--text-dim); font-size:13px;
+  font-family:'JetBrains Mono',monospace; cursor:pointer; transition:all 0.3s;
+}
+.load-more:hover { border-color:var(--acid); background:rgba(223,255,0,0.05); color:var(--text); }
+
+.gal-show-more {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  margin:32px auto 0; padding:16px 48px; border-radius:100px;
+  background:var(--text); color:#fff; border:none; cursor:pointer;
+  font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:2px;
+  transition:all 0.4s; box-shadow:0 4px 20px rgba(0,0,0,0.15);
+}
+.gal-show-more:hover { background:var(--acid); color:var(--text); transform:translateY(-2px); box-shadow:0 8px 30px rgba(223,255,0,0.3); }
+.gal-show-more svg { transition:transform 0.3s; }
+.gal-show-more:hover svg { transform:translateY(2px); }
+
+/* ===== HERO CASES ===== */
+.cases-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:24px; }
+.case-card {
+  background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:24px; overflow:hidden;
+  transition:all 0.4s;
+}
+.case-card:hover { transform:translateY(-4px); box-shadow:0 24px 60px rgba(0,0,0,0.1); }
+.case-card.featured { border-color:rgba(223,255,0,0.4); }
+.case-card .case-img { aspect-ratio:3/4; overflow:hidden; position:relative; }
+.case-card .case-img img { width:100%; height:100%; object-fit:cover; }
+.case-card .case-info { padding:32px; }
+.case-card .case-info h4 { font-size:18px; margin-bottom:8px; }
+.case-card .case-info p { font-size:13px; color:var(--text-dim); line-height:1.9; margin-bottom:16px; }
+.case-meta { display:flex; flex-wrap:wrap; gap:8px; }
+.case-meta span {
+  font-size:11px; padding:4px 12px; border-radius:6px;
+  background:rgba(223,255,0,0.1); border:1px solid rgba(223,255,0,0.2);
+  font-family:'JetBrains Mono',monospace;
+}
+
+/* ===== REFLECTION ===== */
+.reflection-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
+.ref-card {
+  background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:20px; padding:36px;
+  transition:all 0.4s;
+}
+.ref-card:hover { border-color:rgba(223,255,0,0.3); box-shadow:0 12px 30px rgba(0,0,0,0.05); }
+.ref-card .ref-num {
+  font-family:'JetBrains Mono',monospace; font-size:32px; font-weight:700;
+  color:rgba(223,255,0,0.25); margin-bottom:12px;
+}
+.ref-card:hover .ref-num { color:var(--acid); }
+.ref-card h4 { font-size:16px; margin-bottom:10px; }
+.ref-card p { font-size:13px; color:var(--text-dim); line-height:1.9; }
+
+/* ===== FOOTER ===== */
+.footer {
+  text-align:center; padding:80px 60px 60px; background:#fff; border-top:1px solid rgba(0,0,0,0.06);
+}
+.footer-name { font-size:clamp(24px,3vw,36px); font-weight:900; margin-bottom:8px; }
+.footer-role { font-size:14px; color:var(--text-dim); margin-bottom:40px; }
+.footer-links { display:flex; justify-content:center; gap:32px; margin-bottom:40px; }
+.footer-links a { font-size:12px; color:var(--text-dim); text-decoration:none; font-family:'JetBrains Mono',monospace; letter-spacing:1px; transition:color 0.3s; }
+.footer-links a:hover { color:var(--text); }
+.footer-copy { font-size:12px; color:var(--text-light); font-family:'JetBrains Mono',monospace; }
+
+/* ===== ANIMATIONS ===== */
+.fade-up { opacity:0; transform:translateY(40px); transition:opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+.fade-up.visible { opacity:1; transform:translateY(0); }
+.stagger-1 { transition-delay:0.1s; }
+.stagger-2 { transition-delay:0.2s; }
+.stagger-3 { transition-delay:0.3s; }
+.stagger-4 { transition-delay:0.4s; }
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1024px){
+  .overview-grid,.dual-grid,.cases-grid,.reflection-grid { grid-template-columns:1fr; }
+  .matrix-grid,.gallery-grid { grid-template-columns:repeat(2,1fr); }
+  .section { padding:60px 24px; }
+  .nav { padding:16px 24px; }
+  .workflow-timeline { flex-direction:column; padding-top:0; padding-left:40px; }
+  .workflow-timeline::before { top:0; bottom:0; left:12px; right:auto; width:2px; height:auto; }
+  .workflow-step { min-width:auto; padding:0 0 48px 32px; }
+  .workflow-step::before { top:4px; left:-34px; transform:none; }
+  .hero-content-wrap { padding:100px 24px 80px; }
+  .hero::before { background:linear-gradient(180deg, rgba(250,250,248,0.95) 0%, rgba(250,250,248,0.6) 60%, transparent 100%); }
+  .hero-footer { left:24px; right:24px; flex-direction:column; gap:8px; }
+}
+@media(max-width:640px){
+  .matrix-grid,.gallery-grid { grid-template-columns:1fr; }
+  .img-grid { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-blob"></div>
+  <div class="loader-text">LOADING EXPERIENCE</div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-left"><span>AIGC</span> EFFECT DESIGN <span>| 2026.05</span></div>
+  <div class="nav-right">
+    <a href="#overview">OVERVIEW</a>
+    <a href="#problem">PROBLEM</a>
+    <a href="#workflow">WORKFLOW</a>
+    <a href="#cases">CASES</a>
+    <a href="#gallery">GALLERY</a>
+    <a href="#input-showcase">INPUT</a>
+  </div>
+</nav>
+
+<!-- 00 HERO -->
+<section class="hero" id="hero">
+  <div class="hero-content-wrap">
+    <h1>AIGC TEMPLATE<br>DESIGN REPORT</h1>
+    <p class="hero-sub">腾讯元宝 AIGC 效果美学设计实习月报</p>
+    <p class="hero-date">MONTHLY REPORT / 2026.05.13 – 06.13</p>
+    <div class="hero-name">周星芸</div>
+    <p class="hero-role">腾讯元宝 · AIGC 效果美学设计实习生</p>
+    <a href="#overview" class="enter-btn">ENTER <span class="arrow">→</span></a>
+  </div>
+  <div class="hero-footer">
+    <span>© 2026 ZHOU XINGYI · ALL RIGHTS RESERVED</span>
+    <span>AI · DESIGN · EXPERIENCE</span>
+  </div>
+</section>
+
+<!-- 01 OVERVIEW -->
+<section class="section" id="overview">
+  <div class="sec-header fade-up">
+    <div class="sec-label">01 / OVERVIEW</div>
+    <h2 class="sec-title">本月工作结构</h2>
+    <p class="sec-desc">围绕「用户输入照片 → AI 生成风格化效果」核心链路，完成从训练集构建到模板量产的完整工作流。</p>
+  </div>
+  <div class="overview-grid">
+    <div class="overview-card fade-up stagger-1" onclick="scrollToSection('lora-detail')">
+      <div class="oc-num">WORK 01</div>
+      <h3>LoRA 插画风格训练集探索</h3>
+      <p>实习初期的快速上手任务，通过 AI 生成与风格筛选，完成插画师风格 LoRA 训练集素材构建，为后续 AIGC 图像风格控制建立基础认知。</p>
+      <div class="oc-tags"><span>风格一致性</span><span>训练集构建</span><span>批量生成</span></div>
+    </div>
+    <div class="overview-card fade-up stagger-2" onclick="scrollToSection('gallery')">
+      <div class="oc-num">WORK 02</div>
+      <h3>腾讯元宝 AI 玩法模板效果设计</h3>
+      <p>围绕腾讯元宝端内用户与端外年轻化传播需求，持续产出可被用户复用的 AI 图片玩法模板。工作覆盖创意洞察、描述词设计、输入图控制、封面筛选、审美优化、热点响应与数据验证。</p>
+      <div class="oc-tags"><span>Prompt 工程</span><span>双圈层运营</span><span>8 大品类</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 PROBLEM -->
+<section class="section" id="problem">
+  <div class="sec-header fade-up">
+    <div class="sec-label">02 / PROBLEM FRAMING</div>
+    <h2 class="sec-title">AI 玩法模板的<br>双重目标</h2>
+    <p class="sec-desc">先讲清楚「为什么要做这些模板」，让产出从「做图」升维为「解决业务问题」。</p>
+  </div>
+  <div class="dual-grid">
+    <div class="dual-card fade-up stagger-1">
+      <div class="dc-tag">A. 端内存量用户</div>
+      <h4>留存驱动的精致写真需求</h4>
+      <p>年龄偏成熟，对「写真」「古风」「节日祝福」「家庭情感」类内容接受度更高。更关注「像不像自己」「好不好看」「能不能发朋友圈」。</p>
+      <ul>
+        <li>低门槛获得精致、体面、可分享的 AI 写真</li>
+        <li>偏好古风、节日、家庭情感等熟悉题材</li>
+        <li>对 AI 油腻感容忍度相对更高，但审美在升级</li>
+      </ul>
+    </div>
+    <div class="dual-card fade-up stagger-2">
+      <div class="dc-tag">B. 端外年轻用户</div>
+      <h4>拉新驱动的风格化传播需求</h4>
+      <p>更关注新鲜感、风格化、社媒传播性。喜欢视觉强、概念新、能表达个性的模板。对 AI 油腻感更敏感。</p>
+      <ul>
+        <li>需要「有风格、有态度、有传播点」的视觉内容</li>
+        <li>差异化创意与新鲜玩法是传播锚点</li>
+        <li>将效果从「工具使用」升维为「社交货币」</li>
+      </ul>
+    </div>
+  </div>
+  <div class="problem-core fade-up">
+    <h3>如何在「存量用户喜欢」与「年轻用户愿意传播」之间找到审美平衡？</h3>
+    <p>这一命题贯穿本月全部模板设计工作，也是分类策略与审美校准的核心依据。</p>
+  </div>
+</section>
+
+<!-- 03 MATRIX -->
+<section class="section" id="matrix">
+  <div class="sec-header fade-up">
+    <div class="sec-label">03 / STRATEGY MATRIX</div>
+    <h2 class="sec-title">AI 玩法模板<br>设计矩阵</h2>
+    <p class="sec-desc">将模板设计拆为四个维度，建立可复用的评估与决策框架。</p>
+  </div>
+  <div class="matrix-grid">
+    <div class="matrix-card fade-up stagger-1">
+      <div class="mc-num">01</div>
+      <h4>用户匹配度</h4>
+      <p>这个模板是给谁玩的？中年写真用户、年轻社媒用户、节日热点用户，还是泛娱乐用户？</p>
+      <div class="matrix-detail"><div class="matrix-detail-inner">
+        在模板立项阶段即明确目标人群画像，通过风格符号、色彩倾向与构图语境预判用户接受度。端内用户偏好低理解成本的传统美学升级，端外用户需要强差异化的视觉锚点。
+      </div></div>
+    </div>
+    <div class="matrix-card fade-up stagger-2">
+      <div class="mc-num">02</div>
+      <h4>视觉吸引力</h4>
+      <p>封面能不能一眼抓住用户？构图、色彩、人物状态、氛围感是否够强？</p>
+      <div class="matrix-detail"><div class="matrix-detail-inner">
+        封面是模板的第一层转化。筛选标准不仅包括画面完成度，也包括人群匹配、缩略图识别度、情绪感染力与玩法预期清晰度。
+      </div></div>
+    </div>
+    <div class="matrix-card fade-up stagger-3">
+      <div class="mc-num">03</div>
+      <h4>生成稳定性</h4>
+      <p>用户上传自己的照片后，能不能稳定生成类似效果？脸部、姿态、服饰、背景是否容易失控？</p>
+      <div class="matrix-detail"><div class="matrix-detail-inner">
+        高质量输入图是降低 AI 油腻感的第一道阈值。通过控制光线方向、面部角度、背景复杂度，确保生成结果的稳定性与审美上限。
+      </div></div>
+    </div>
+    <div class="matrix-card fade-up stagger-4">
+      <div class="mc-num">04</div>
+      <h4>传播潜力</h4>
+      <p>它是否适合发朋友圈、小红书、社群？有没有节日、身份、情绪、潮流标签？</p>
+      <div class="matrix-detail"><div class="matrix-detail-inner">
+        传播价值 = 情绪共鸣 × 视觉差异度 × 社媒适配性。热点响应型模板依赖时效性，风格化模板依赖长期审美沉淀。
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 WORKFLOW -->
+<section class="section" id="workflow">
+  <div class="sec-header fade-up">
+    <div class="sec-label">04 / WORKFLOW</div>
+    <h2 class="sec-title">从创意到上线<br>一个 AI 模板的生产链路</h2>
+    <p class="sec-desc">把真实产出包装成专业流程，展示完整的方法论闭环。</p>
+  </div>
+  <div class="workflow-timeline">
+    <div class="workflow-step fade-up">
+      <div class="ws-num">STEP 01</div>
+      <h4>Trend Scan · 热点与创意扫描</h4>
+      <p>关注节日节点（高考、父亲节、毕业季），观察社媒流行趋势（写真风格、头像玩法、壁纸风格），判断传播价值与品类匹配度。</p>
+      <div class="workflow-tags"><span>毕业季</span><span>父亲节</span><span>古风写真</span><span>社媒趋势</span></div>
+    </div>
+    <div class="workflow-step fade-up">
+      <div class="ws-num">STEP 02</div>
+      <h4>Prompt Design · 描述词设计</h4>
+      <p>将视觉目标拆解为人物、服装、场景、光影、镜头、材质、氛围、风格关键词，通过多轮生成验证描述词的稳定性与输出质量。</p>
+      <div class="workflow-tags"><span>人物主体</span><span>场景环境</span><span>光影氛围</span><span>风格控制</span><span>负面规避</span></div>
+    </div>
+    <div class="workflow-step fade-up">
+      <div class="ws-num">STEP 03</div>
+      <h4>Input Image Control · 输入图控制</h4>
+      <p>不仅关注最终生成图，也主动控制模拟用户输入图的基础质量。通过更干净的面部结构、自然光影、清晰五官、合理姿态，提高生成结果的稳定性与审美上限。</p>
+      <div class="workflow-tags"><span>面部结构</span><span>自然光影</span><span>合理姿态</span><span>去 AI 感</span></div>
+    </div>
+    <div class="workflow-step fade-up">
+      <div class="ws-num">STEP 04</div>
+      <h4>Cover Selection · 封面筛选</h4>
+      <p>封面不是单张好看图片，而是用户点击模板的第一转化入口。筛选标准包括：第一眼吸引力、人像完成度、风格辨识度、点击转化潜力。</p>
+      <div class="workflow-tags"><span>第一眼吸引</span><span>人像完成度</span><span>风格辨识度</span><span>转化潜力</span></div>
+    </div>
+    <div class="workflow-step fade-up">
+      <div class="ws-num">STEP 05</div>
+      <h4>Online Validation · 数据验证</h4>
+      <p>通过上线后的用户数据反馈，验证不同风格模板在端内与端外场景中的接受度。高表现模板为后续玩法提供可复用经验。</p>
+      <div class="workflow-tags"><span>端内留存</span><span>端外传播</span><span>A/B 验证</span><span>审美校准</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 HERO CASES -->
+<section class="section" id="cases">
+  <div class="sec-header fade-up">
+    <div class="sec-label">05 / HERO CASES</div>
+    <h2 class="sec-title">高表现模板<br>案例复盘</h2>
+    <p class="sec-desc">结合数据反馈与审美判断，记录四个不同方向的实践探索。</p>
+  </div>
+  <div class="cases-grid">
+    <div class="case-card featured fade-up stagger-1">
+      <div class="case-img">
+        <img src="images/showcase/01 蜡笔涂鸦.png" alt="蜡笔涂鸦">
+      </div>
+      <div class="case-info">
+        <h4>蜡笔涂鸦</h4>
+        <p>该模板在同期玩法中取得领先数据表现，说明其视觉风格同时具备端内用户接受度与端外传播潜力。以蜡笔肌理+高饱和色彩打破 AI 油腻感，画面在人物状态、光影氛围与风格辨识度上形成较强的第一眼吸引力。</p>
+        <div class="case-meta"><span>童趣破圈</span><span>去 AI 感</span><span>社交货币</span></div>
+      </div>
+    </div>
+    <div class="case-card featured fade-up stagger-2">
+      <div class="case-img">
+        <img src="images/showcase/02 摩登长辈祝福.png" alt="摩登长辈祝福">
+      </div>
+      <div class="case-info">
+        <h4>摩登长辈祝福</h4>
+        <p>该模板的优势不在于单纯堆叠视觉元素，而在于通过更克制的构图、统一的色彩关系与更自然的人像质感，降低了常见 AI 生成图的油腻感。证明了 AI 写真模板可以通过更高级的审美控制提升用户信任感。</p>
+        <div class="case-meta"><span>复古新编</span><span>情怀杀</span><span>端内高留存</span></div>
+      </div>
+    </div>
+    <div class="case-card fade-up stagger-3">
+      <div class="case-img">
+        <img src="images/showcase/03 银蝶赛博妆.png" alt="银蝶赛博妆">
+      </div>
+      <div class="case-info">
+        <h4>银蝶赛博妆</h4>
+        <p>银色金属质感+蝶翼元素+赛博妆容，尝试将 Y2K 视觉符号融入模板设计。在端外场景中达到了审美与生成质量的平衡，也获得了较为理想的玩法点击率，为年轻化模板积累了一些可参考的视觉经验。</p>
+        <div class="case-meta"><span>风格穿透</span><span>Y2K</span><span>端外拉新</span></div>
+      </div>
+    </div>
+    <div class="case-card fade-up stagger-4">
+      <div class="case-img">
+        <img src="images/showcase/05 星荷锦.png" alt="星荷锦">
+      </div>
+      <div class="case-info">
+        <h4>星荷锦</h4>
+        <p>东方美学意象+诗意构图+温润色彩，精准击中端内成熟用户的文化认同与审美舒适区。在传统题材中做质感升级，避免落入低质 AI 感与传统影楼风之间的审美断层。</p>
+        <div class="case-meta"><span>东方美学</span><span>质感升级</span><span>文化认同</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 TEMPLATE GALLERY -->
+<section class="section" id="gallery">
+  <div class="sec-header fade-up">
+    <div class="sec-label">06 / TEMPLATE GALLERY</div>
+    <h2 class="sec-title">模板分类展厅</h2>
+    <p class="sec-desc">覆盖 8 大品类的完整模板矩阵。<span style="color:var(--text);font-weight:700;">▼ 点击下方卡片</span>展开查看每个类别的全部作品。</p>
+  </div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+  <div id="galleryDetails"></div>
+</section>
+
+<!-- 07 INPUT IMAGES -->
+<section class="section" id="input-showcase">
+  <div class="sec-header fade-up">
+    <div class="sec-label">07 / INPUT IMAGE QUALITY</div>
+    <h2 class="sec-title">高质量输入图<br>是优质模板的起点</h2>
+    <p class="sec-desc">输入图质量直接决定 AI 生成结果的审美上限。自然的光影、清晰的面部结构、合理的姿态角度，是降低 AI 油腻感、提升生成真实感的第一道门槛。每一张模板封面背后，都始于一次对输入图的精心筛选与控制。</p>
+    <p style="margin-top:16px;font-size:13px;color:var(--text-dim);display:inline-flex;align-items:center;gap:8px;padding:8px 20px;background:rgba(223,255,0,0.12);border:1px solid rgba(223,255,0,0.25);border-radius:8px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--acid)" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>以下输入图均由 AI 生成，用于模拟用户上传图片的基础质量</span>
+    </p>
+  </div>
+  <div class="img-grid" id="inputGrid"></div>
+</section>
+
+<!-- 08 REFLECTION -->
+<section class="section" id="reflection">
+  <div class="sec-header fade-up">
+    <div class="sec-label">08 / DESIGN TAKEAWAYS</div>
+    <h2 class="sec-title">阶段性方法沉淀</h2>
+    <p class="sec-desc">让产出沉淀为可复用的认知资产与方法论。</p>
+  </div>
+  <div class="reflection-grid">
+    <div class="ref-card fade-up stagger-1">
+      <div class="ref-num">01</div>
+      <h4>AI 模板不是「生成好看的图」，而是设计一个可复用的用户玩法</h4>
+      <p>需要同时考虑用户上传门槛、生成稳定性、封面吸引力与结果可分享性。单张精美不等于一个好模板。</p>
+    </div>
+    <div class="ref-card fade-up stagger-2">
+      <div class="ref-num">02</div>
+      <h4>审美判断需要和业务目标绑定</h4>
+      <p>面向端内用户时，在熟悉题材中做质感升级；面向年轻用户时，在风格、概念和传播语境上做创新。没有放之四海而皆准的「好看」。</p>
+    </div>
+    <div class="ref-card fade-up stagger-3">
+      <div class="ref-num">03</div>
+      <h4>输入图质量会直接影响模板上限</h4>
+      <p>高质量、自然、结构清晰的输入图能够有效提升生成结果的稳定性，减少 AI 油腻感和失真问题。输入图控制是第一道审美门槛。</p>
+    </div>
+    <div class="ref-card fade-up stagger-4">
+      <div class="ref-num">04</div>
+      <h4>封面是模板的第一层转化</h4>
+      <p>一个好的封面需要同时承担审美展示、玩法说明和点击吸引三重功能。缩略图识别度与情绪感染力同等重要。</p>
+    </div>
+    <div class="ref-card fade-up" style="grid-column:1/-1;">
+      <div class="ref-num">05</div>
+      <h4>数据反馈可以反向校准审美方向</h4>
+      <p>高表现模板为后续玩法提供了可复用经验：明确人群、清晰风格、稳定生成、强封面表达，是提高模板表现的重要基础。审美直觉需要通过数据不断验证和迭代。</p>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top:64px;" class="fade-up">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-light); letter-spacing:2px; margin-bottom:16px;">NEXT STEP</div>
+    <p style="font-size:16px; color:var(--text-dim); max-width:600px; margin:0 auto; line-height:1.9;">
+      后续将继续围绕「端内用户留存」与「端外年轻化传播」双目标，沉淀更系统的 AIGC 模板视觉方法论，探索更稳定、更高审美、更具传播力的 AI 图片玩法。
+    </p>
+  </div>
+</section>
+
+<!-- LORA TRAINING SET -->
+<section class="section" id="lora-detail">
+  <div class="sec-header fade-up">
+    <div class="sec-label">WORK 01 / LORA TRAINING</div>
+    <h2 class="sec-title">LORA 插画风格训练集</h2>
+    <p class="sec-desc">183 张生成图 · 风格锚定 · 批量变体 · 配色打散排列</p>
+  </div>
+  <div class="img-grid" id="loraGrid"></div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="contact">
+  <div class="footer-name">周星芸</div>
+  <div class="footer-role">AIGC Effect Aesthetics Design Intern @ Tencent Yuanbao · 2026.05</div>
+  <div class="footer-links">
+    <a href="#hero">TOP</a>
+    <a href="#overview">OVERVIEW</a>
+    <a href="#cases">CASES</a>
+    <a href="#gallery">GALLERY</a>
+  </div>
+  <div class="footer-copy">DESIGN MONTHLY SHOWCASE · BUILT WITH AI & CARE</div>
+</footer>
+
+<script>
+/* ===== IMAGE DATA ===== */
+const loraImages = [
+"images/lora/1778727919403 1.png", "images/lora/1778744693095 1.png", "images/lora/1778749915973 1.png", "images/lora/1778752127042 1.png", "images/lora/1778752146970 1.png", "images/lora/1778752166284 1.png", "images/lora/1778752279216 1.png", "images/lora/1778752340851 1.png", "images/lora/1778752403537 1.png", "images/lora/1778752636135 1.png", "images/lora/1778752744811 1.png", "images/lora/1778752972489 1.png", "images/lora/1778753095584 1.png", "images/lora/1778753122092 1.png", "images/lora/1778753368677 1.png", "images/lora/1778753490477 1.png", "images/lora/1778753495677 1.png", "images/lora/1778753573258 1.png", "images/lora/1778753737374 1.png", "images/lora/1778757595674 1.png", "images/lora/1778757621868 1.png", "images/lora/1778757807488 1.png", "images/lora/1778758024381 1.png", "images/lora/1778758724470 1.png", "images/lora/1778765639701 1.png", "images/lora/1778812786980 1.png", "images/lora/1778816771793 1.png", "images/lora/1778816777455 1.png", "images/lora/1778816783088 1.png", "images/lora/1778825484624 1.png", "images/lora/1778829408955 1.png", "images/lora/1778829671831 1.png", "images/lora/1778829687728 1.png", "images/lora/1778829699758 1.png", "images/lora/1778829785330 1.png", "images/lora/1778829820292 1.png", "images/lora/1778829836311 1.png", "images/lora/1778831042061 1.png", "images/lora/1778832946042 1.png", "images/lora/1778833040811 1.png", "images/lora/1779073430528 1.png", "images/lora/1779074498249 1.png", "images/lora/1779075353822 1.png", "images/lora/1779076826482 1.png", "images/lora/1779076838449 1.png", "images/lora/ChatGPT Image 2026年5月14日 15_26_09 1.png", "images/lora/ChatGPT Image 2026年5月14日 15_33_37 1.png", "images/lora/Image 100 1.png", "images/lora/Image 101 1.png", "images/lora/Image 102 1.png", "images/lora/Image 110 1.png", "images/lora/Image 111 1.png", "images/lora/Image 117 (1) 1.png", "images/lora/Image 119 1.png", "images/lora/Image 120 1.png", "images/lora/Image 129 1.png", "images/lora/Image 130 1.png", "images/lora/Image 137 1.png", "images/lora/Image 145 1.png", "images/lora/Image 146 2.png", "images/lora/Image 148 1.png", "images/lora/Image 150 1.png", "images/lora/Image 154 1.png", "images/lora/Image 155 1.png", "images/lora/Image 157 1.png", "images/lora/Image 158 1.png", "images/lora/Image 161 1.png", "images/lora/Image 163 2.png", "images/lora/Image 173 1.png", "images/lora/Image 180 2.png", "images/lora/Image 181 1.png", "images/lora/Image 183 2.png", "images/lora/Image 188 2.png", "images/lora/Image 189 1.png", "images/lora/Image 194 2.png", "images/lora/Image 197 1.png", "images/lora/Image 198 1.png", "images/lora/Image 200 1.png", "images/lora/Image 201 1.png", "images/lora/Image 202 2.png", "images/lora/Image 203 1.png", "images/lora/Image 205 2.png", "images/lora/Image 207 1.png", "images/lora/Image 208 1.png", "images/lora/Image 209 1.png", "images/lora/Image 212 1.png", "images/lora/Image 215 1.png", "images/lora/Image 216 1.png", "images/lora/Image 217 1.png", "images/lora/Image 227 1.png", "images/lora/Image 228 1.png", "images/lora/Image 233 1.png", "images/lora/Image 234 1.png", "images/lora/Image 235 1.png", "images/lora/Image 237 1.png", "images/lora/Image 240 2.png", "images/lora/Image 248 1.png", "images/lora/Image 261 1.png", "images/lora/Image 263 1.png", "images/lora/Image 264 1.png", "images/lora/Image 265 1.png", "images/lora/Image 266 1.png", "images/lora/Image 267 1.png", "images/lora/Image 269 1.png", "images/lora/Image 282 1.png", "images/lora/Image 283 1.png", "images/lora/Image 284 1.png", "images/lora/Image 291 1.png", "images/lora/Image 293 1.png", "images/lora/Image 294 1.png", "images/lora/Image 295 1.png", "images/lora/Image 298 1.png", "images/lora/Image 307 1.png", "images/lora/Image 312 1.png", "images/lora/Image 313 1.png", "images/lora/Image 314 1.png", "images/lora/Image 315 1.png", "images/lora/Image 318 1.png", "images/lora/Image 338 1.png", "images/lora/Image 339 1.png", "images/lora/Image 340 1.png", "images/lora/Image 341 1.png", "images/lora/Image 342 1.png", "images/lora/Image 354 1.png", "images/lora/Image 358 (1) 1.png", "images/lora/Image 374 1.png", "images/lora/Image 374 2.png", "images/lora/Image 375 1.png", "images/lora/Image 376 1.png", "images/lora/Image 377 1.png", "images/lora/Image 378 1.png", "images/lora/Image 380 1.png", "images/lora/Image 383 1.png", "images/lora/Image 385 1.png", "images/lora/Image 386 1.png", "images/lora/Image 387 1.png", "images/lora/Image 388 1.png", "images/lora/Image 390 1.png", "images/lora/Image 392 1.png", "images/lora/Image 397 (2) 1.png", "images/lora/Image 398 1.png", "images/lora/Image 399 1.png", "images/lora/Image 401 1.png", "images/lora/Image 402 1.png", "images/lora/Image 403 1.png", "images/lora/Image 405 1.png", "images/lora/Image 406 1.png", "images/lora/Image 409 1.png", "images/lora/Image 411 1.png", "images/lora/Image 413 1.png", "images/lora/Image 415 1.png", "images/lora/Image 417 1.png", "images/lora/Image 420 1.png", "images/lora/Image 421 1.png", "images/lora/Image 423 1.png", "images/lora/Image 424 1.png", "images/lora/Image 425 1.png", "images/lora/Image 426 1.png", "images/lora/Image 429 1.png", "images/lora/Image 54 1..PNG", "images/lora/Image 66 1..PNG", "images/lora/Image 70 1.png", "images/lora/Image 71 1..PNG", "images/lora/Image 75 1..PNG", "images/lora/Image 76 1.png", "images/lora/Image 78 1..PNG", "images/lora/Image 79 1.png", "images/lora/Image 83 1.png", "images/lora/Image 84 1..PNG", "images/lora/Image 86 1.png", "images/lora/Image 89 1.png", "images/lora/Image 90 1..PNG", "images/lora/Image 91 1.png", "images/lora/Image 91 2.png", "images/lora/Image 92 1.png", "images/lora/Image 93 2 (1)..PNG", "images/lora/Image 93 2..PNG", "images/lora/Image 94 1.png", "images/lora/Image 95 1.png", "images/lora/Image 96 1.png", "images/lora/Image 97 1.png", "images/lora/Image 98 1.png", "images/lora/Image 99 1.png", ];
+
+const effectCategories = [
+  {
+    id: '01-styling', name: '风格化人像', count: 8,
+    cover: 'images/showcase/01 蜡笔涂鸦.png',
+    desc: '蜡笔涂鸦、粉雾花间眠等差异化风格，主攻端外社交传播。',
+    images: [
+"images/effects/01-styling/01 蜡笔涂鸦.png", "images/effects/01-styling/春糖花满衣.png", "images/effects/01-styling/粉雾花间眠.png", "images/effects/01-styling/千禧甜心.png", "images/effects/01-styling/浅夏蓝璃风.png", "images/effects/01-styling/糖雾绘像.png", "images/effects/01-styling/甜漫初颜.png", "images/effects/01-styling/甜梦兔花园.png", ]},
+  {
+    id: '02-gufeng', name: '古风写真', count: 17,
+    cover: 'images/effects/02-gufeng/仙羽光影风.png',
+    desc: '嫦娥抱玉兔、春和景明等传统美学意象，服务端内核心用户。',
+    images: [
+"images/effects/02-gufeng/青鸾梦.png", "images/effects/02-gufeng/嫦娥抱玉兔.png", "images/effects/02-gufeng/春和景明.png", "images/effects/02-gufeng/点翠芍药.png", "images/effects/02-gufeng/枫庭梦.png", "images/effects/02-gufeng/宫廷工笔风.png", "images/effects/02-gufeng/国色芳华.png", "images/effects/02-gufeng/红衣簪花.png", "images/effects/02-gufeng/静蓝映画.png", "images/effects/02-gufeng/静蓝映画-1.png", "images/effects/02-gufeng/暖光森语.png", "images/effects/02-gufeng/暖光森语-1.png", "images/effects/02-gufeng/彩珠谣.png", "images/effects/02-gufeng/清婉仪.png", "images/effects/02-gufeng/森光初见.png", "images/effects/02-gufeng/仙鹤幻羽.png", "images/effects/02-gufeng/仙羽光影风.png", ]},
+  {
+    id: '03-innovation', name: '创新探索', count: 10,
+    cover: 'images/showcase/03 先锋女团拟人.png',
+    desc: '冰晶数字人、银蝶赛博妆等实验性方向，验证前沿审美。',
+    images: [
+"images/effects/03-innovation/emoji情绪识别.png", "images/effects/03-innovation/冰晶数字人.png", "images/effects/03-innovation/蝶梦琉璃光.png", "images/effects/03-innovation/基础亚裔妆.png", "images/effects/03-innovation/美式校园卡.png", "images/effects/03-innovation/未来之星闪卡.png", "images/effects/03-innovation/夏日玻璃珠.png", "images/effects/03-innovation/先锋女团拟人.png", "images/effects/03-innovation/星河初雪.png", "images/effects/03-innovation/纸雕故事书.png", ]},
+  {
+    id: '04-ins', name: '年轻化/INS风', count: 8,
+    cover: 'images/showcase/04  蝴蝶结可颂.png',
+    desc: '吃个早午餐、蝴蝶结可颂等轻生活方式模板。',
+    images: [
+"images/effects/04-ins/吃个早午餐.png", "images/effects/04-ins/玫瑰夜色.png", "images/effects/04-ins/暖光酒馆随手拍.png", "images/effects/04-ins/书页暖阳.png", "images/effects/04-ins/甜软卧拍.png", "images/effects/04-ins/甜系街头涂鸦.png", "images/effects/04-ins/夏日茶颜.png", "images/effects/04-ins/元气青柠檬.png", ]},
+  {
+    id: '05-wallpaper', name: '壁纸', count: 28,
+    cover: 'images/showcase/05 星荷锦.png',
+    desc: '逢考必过、星荷锦等节点运营与情绪唤醒型内容。',
+    images: [
+"images/effects/05-wallpaper/赤霞隐.png", "images/effects/05-wallpaper/逢考必过.png", "images/effects/05-wallpaper/凤栖云.png", "images/effects/05-wallpaper/浮樱映水.png", "images/effects/05-wallpaper/父爱如山.png", "images/effects/05-wallpaper/荷运来.png", "images/effects/05-wallpaper/鸿运莲.png", "images/effects/05-wallpaper/金鳞逐涡.png", "images/effects/05-wallpaper/锦鲤云梦.png", "images/effects/05-wallpaper/考试好运符.png", "images/effects/05-wallpaper/考运爆棚.png", "images/effects/05-wallpaper/鲤跃青云路.png", "images/effects/05-wallpaper/荔香云枝.png", "images/effects/05-wallpaper/莲灯鹤影.png", "images/effects/05-wallpaper/莲愿安然.png", "images/effects/05-wallpaper/灵羽山河.png", "images/effects/05-wallpaper/龙虎云瑞.png", "images/effects/05-wallpaper/暮鹤双影.png", "images/effects/05-wallpaper/青岫吟.png", "images/effects/05-wallpaper/清澈泳池少年.png", "images/effects/05-wallpaper/秋山云水间.png", "images/effects/05-wallpaper/双鲤呈祥.png", "images/effects/05-wallpaper/星荷锦.png", "images/effects/05-wallpaper/学士喵壁纸.png", "images/effects/05-wallpaper/月夜花灵歌.png", "images/effects/05-wallpaper/月映山河.png", "images/effects/05-wallpaper/云瓷游龙.png", "images/effects/05-wallpaper/竹影映晴空.png", ]},
+  {
+    id: '06-festival', name: '节日热点', count: 9,
+    cover: 'images/showcase/06 高考大字报.png',
+    desc: '毕业打卡照、高考大字报等热点响应模板。',
+    images: [
+"images/effects/06-festival/毕业打卡照.png", "images/effects/06-festival/毕业毛绒玩偶.png", "images/effects/06-festival/副本通关.png", "images/effects/06-festival/高考大字报.png", "images/effects/06-festival/高考新闻采访.png", "images/effects/06-festival/看球赛抓拍-世界杯版.png", "images/effects/06-festival/课本封面祝福.png", "images/effects/06-festival/摩登长辈祝福-1.png", "images/effects/06-festival/雪屋暖忆.png", ]},
+  {
+    id: '07-king', name: '王者/IP联动', count: 4,
+    cover: 'images/showcase/07 影cos-3..png',
+    desc: '安琪拉、敖隐等王者英雄cos联动，借势IP流量。',
+    images: [
+"images/effects/07-king/安琪拉王者cos-1.png", "images/effects/07-king/敖隐王者cos-2.png", "images/effects/07-king/妲己王者cos.png", "images/effects/07-king/影cos-3..png", ]},
+  {
+    id: '08-pet', name: '宠物玩法', count: 5,
+    cover: 'images/showcase/08 外星宠物喵.png',
+    desc: '外星宠物喵、粉泡星宠等萌宠方向，拓展非人像场景。',
+    images: [
+"images/effects/08-pet/星夜萌宠派.png", "images/effects/08-pet/粉泡星宠.png", "images/effects/08-pet/外星宠物喵.png", "images/effects/08-pet/夏日宠物游泳.png", "images/effects/08-pet/傲娇学士服宠物.png" ]}
+];
+
+/* ===== HERO - static decorative elements, no mouse tracking ===== */
+
+/* ===== LOADING ===== */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+  }, 1000);
+});
+
+/* ===== NAV SCROLL ===== */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+/* ===== FADE UP ANIMATIONS ===== */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+/* ===== SCROLL TO SECTION ===== */
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ===== GALLERY RENDERING ===== */
+const galleryGrid = document.getElementById('galleryGrid');
+const galleryDetails = document.getElementById('galleryDetails');
+
+// Shuffle lora images
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+const shuffledLora = shuffleArray(loraImages);
+
+// Render gallery cards
+effectCategories.forEach((cat, idx) => {
+  const card = document.createElement('div');
+  card.className = 'gallery-card fade-up';
+  card.innerHTML = `
+    <div class="gal-img">
+      <img src="${cat.cover}" loading="lazy" alt="${cat.name}">
+      <div class="gal-badge">${String(idx+1).padStart(2,'0')}</div>
+      <div class="gal-expand-hint">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        <span>点击展开</span>
+      </div>
+    </div>
+    <div class="gal-info">
+      <div class="gal-name">${cat.name}</div>
+      <div class="gal-count">${cat.count} TEMPLATES</div>
+    </div>
+  `;
+  card.onclick = () => toggleGalleryDetail(cat.id);
+  galleryGrid.appendChild(card);
+  observer.observe(card);
+});
+
+// Render gallery detail sections
+effectCategories.forEach(cat => {
+  const detail = document.createElement('div');
+  detail.className = 'gallery-detail';
+  detail.id = 'detail-' + cat.id;
+  const imgItems = cat.images.map((src, i) => {
+    const name = src.split('/').pop().replace(/\.png$/i, '');
+    return `<div class="img-item"><img src="${src}" loading="lazy" alt="${name}"><div class="img-overlay"><span>${name}</span></div></div>`;
+  }).join('');
+  detail.innerHTML = `
+    <div class="gallery-detail-inner">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <h4>${cat.name} · ${cat.count} 张作品</h4>
+        <button class="load-more" onclick="toggleGalleryDetail('${cat.id}')">收起 ↑</button>
+      </div>
+      <p style="font-size:14px;color:var(--text-dim);margin-bottom:24px;">${cat.desc}</p>
+      <div class="img-grid">${imgItems}</div>
+    </div>
+  `;
+  galleryDetails.appendChild(detail);
+});
+
+function toggleGalleryDetail(id) {
+  const detail = document.getElementById('detail-' + id);
+  const isOpen = detail.classList.contains('open');
+  // Close all others
+  document.querySelectorAll('.gallery-detail').forEach(d => d.classList.remove('open'));
+  if (!isOpen) {
+    detail.classList.add('open');
+    setTimeout(() => detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 300);
+  }
+}
+
+/* ===== INPUT IMAGES ===== */
+const inputImages = [
+"images/input/蜡笔涂鸦_输入图.png",
+"images/input/星夜萌宠派_输入图.png",
+"images/input/春糖花满衣_输入图.png",
+"images/input/仙鹤幻羽_输入图.png",
+"images/input/浅夏蓝璃风_输入图.png",
+"images/input/粉雾花间眠_输入图.png",
+"images/input/国色芳华_输入图.png",
+"images/input/夏日玻璃珠_输入图.png",
+"images/input/先锋女团拟人_输入图.png",
+"images/input/千禧甜心_输入图.png",
+"images/input/外星宠物喵_输入图.png",
+"images/input/点翠芍药_输入图.png",
+"images/input/银蝶赛博妆_输入图.png",
+"images/input/星河初雪_输入图.png",
+"images/input/甜梦兔花园_输入图.png",
+"images/input/静蓝映画.png",
+"images/input/夏日茶颜_输入图.png",
+"images/input/糖雾绘像_输入图.png",
+"images/input/粉泡星宠_输入图.png",
+"images/input/书页暖阳_输入图.png",
+"images/input/仙羽光影风_输入图.png",
+"images/input/摩登长辈祝福_输入图.png",
+"images/input/蝶梦琉璃光_输入图.png",
+"images/input/甜系街头涂鸦_输入图.png",
+"images/input/吃个早午餐.png",
+"images/input/红衣簪花_输入图.png",
+"images/input/蝴蝶结可颂_输入图.png",
+"images/input/嫦娥抱玉兔_输入图.png",
+"images/input/玫瑰夜色_输入图.png",
+"images/input/甜软卧拍_输入图.png",
+"images/input/基础亚裔妆_输入图.png",
+"images/input/雪屋暖忆_输入图.png",
+"images/input/纸雕故事书_输入图.png",
+"images/input/emoji情绪识别_输入图.png",
+"images/input/清婉仪_输入图.png",
+"images/input/千禧音乐写真_输入图.png",
+"images/input/甜漫初颜_输入图.png",
+"images/input/高考大字报_输入图.png",
+"images/input/美式校园卡_输入图.png",
+"images/input/副本通关_输入图.png",
+"images/input/高考新闻采访_输入图.png",
+"images/input/看球赛抓拍-世界杯版_输入图.png",
+"images/input/安琪拉王者cos图.png",
+"images/input/雪屋暖忆_输入图-1.png"
+];
+
+const inputGridEl = document.getElementById('inputGrid');
+const INPUT_INITIAL = 12;
+inputImages.forEach((src, i) => {
+  const name = src.split('/').pop().replace(/_输入图.*\.png$/i, '').replace(/\.png$/i, '');
+  const div = document.createElement('div');
+  div.className = 'img-item';
+  if (i >= INPUT_INITIAL) div.style.display = 'none';
+  div.innerHTML = `<img src="${src}" loading="lazy" alt="${name}"><div class="img-overlay"><span>${name}</span></div>`;
+  inputGridEl.appendChild(div);
+});
+if (inputImages.length > INPUT_INITIAL) {
+  const btn = document.createElement('button');
+  btn.className = 'gal-show-more';
+  btn.id = 'inputExpandBtn';
+  let inputExpanded = false;
+  btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>展开全部 ${inputImages.length} 张输入图`;
+  btn.onclick = function() {
+    inputExpanded = !inputExpanded;
+    if (inputExpanded) {
+      inputGridEl.querySelectorAll('.img-item').forEach(item => item.style.display = '');
+      this.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>收起输入图`;
+    } else {
+      inputGridEl.querySelectorAll('.img-item').forEach((item, idx) => {
+        if (idx >= INPUT_INITIAL) item.style.display = 'none';
+      });
+      this.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>展开全部 ${inputImages.length} 张输入图`;
+      document.getElementById('input-showcase').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  inputGridEl.parentElement.appendChild(btn);
+}
+
+/* ===== LORA RENDER WITH COLLAPSE ===== */
+const loraGridEl = document.getElementById('loraGrid');
+let loraInitialized = false;
+const loraSection = document.getElementById('lora-detail');
+const LORA_INITIAL = 16;
+
+const loraObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !loraInitialized) {
+      loraInitialized = true;
+      let loraExpanded = false;
+      shuffledLora.forEach((src, i) => {
+        const div = document.createElement('div');
+        div.className = 'img-item';
+        if (i >= LORA_INITIAL) div.style.display = 'none';
+        div.innerHTML = `<img src="${src}" loading="lazy" alt="LoRA"><div class="img-overlay"><span>LoRA Style</span></div>`;
+        loraGridEl.appendChild(div);
+      });
+      if (shuffledLora.length > LORA_INITIAL) {
+        const btn = document.createElement('button');
+        btn.className = 'gal-show-more';
+        btn.id = 'loraExpandBtn';
+        btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>展开全部 ${shuffledLora.length} 张训练图`;
+        btn.onclick = function() {
+          loraExpanded = !loraExpanded;
+          if (loraExpanded) {
+            loraGridEl.querySelectorAll('.img-item').forEach(item => item.style.display = '');
+            this.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>收起训练图`;
+          } else {
+            loraGridEl.querySelectorAll('.img-item').forEach((item, idx) => {
+              if (idx >= LORA_INITIAL) item.style.display = 'none';
+            });
+            this.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>展开全部 ${shuffledLora.length} 张训练图`;
+            loraSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        };
+        loraGridEl.parentElement.appendChild(btn);
+      }
+    }
+  });
+}, { threshold: 0.05 });
+loraObserver.observe(loraSection);
+
+/* ===== OVERVIEW CARD CLICK FOR LORA ===== */
+document.querySelector('.overview-card').onclick = function() {
+  scrollToSection('lora-detail');
+};
+</script>
+
+</body>
+</html>
