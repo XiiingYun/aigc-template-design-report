@@ -138,9 +138,9 @@ body {
 .sec-desc { font-size:15px; color:var(--text-dim); max-width:640px; line-height:1.9; }
 
 /* ===== OVERVIEW ===== */
-.overview-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.overview-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
 .overview-card {
-  background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:24px; padding:48px;
+  background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:24px; padding:36px;
   cursor:pointer; transition:all 0.4s ease; position:relative; overflow:hidden;
 }
 .overview-card:hover { transform:translateY(-4px); box-shadow:0 24px 60px rgba(0,0,0,0.06); border-color:rgba(223,255,0,0.3); }
@@ -428,14 +428,54 @@ body {
 }
 .loop-back svg { width:16px; height:16px; stroke:var(--acid); fill:none; stroke-width:2; }
 
+/* ===== BOARD BLOCKS (shared) ===== */
+.board-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:48px; }
+.board-block {
+  background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:20px; padding:36px;
+  transition:all 0.4s;
+}
+.board-block:hover { transform:translateY(-4px); box-shadow:0 16px 40px rgba(0,0,0,0.06); border-color:rgba(223,255,0,0.3); }
+.board-block .bb-tag {
+  font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px;
+  padding:4px 12px; border-radius:6px; background:rgba(223,255,0,0.1); color:var(--text-light);
+  display:inline-block; margin-bottom:16px; border:1px solid rgba(223,255,0,0.2);
+}
+.board-block h4 { font-size:16px; margin-bottom:12px; font-weight:700; }
+.board-block ul { list-style:none; padding:0; margin:0; }
+.board-block ul li {
+  font-size:13px; color:var(--text-dim); padding:5px 0 5px 20px; position:relative; line-height:1.8;
+}
+.board-block ul li::before { content:'→'; position:absolute; left:0; color:var(--acid); font-size:12px; }
+.board-block p { font-size:13px; color:var(--text-dim); line-height:1.9; }
+
+/* Feedback evaluation dim blocks */
+.eval-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:48px; }
+.eval-block {
+  background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:16px; padding:24px 20px;
+  text-align:center; transition:all 0.4s;
+}
+.eval-block:hover { border-color:rgba(223,255,0,0.3); box-shadow:0 8px 24px rgba(0,0,0,0.04); }
+.eval-block .eb-num {
+  font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px;
+  color:var(--text-light); margin-bottom:8px;
+}
+.eval-block .eb-name { font-size:14px; font-weight:700; margin-bottom:6px; }
+.eval-block .eb-desc { font-size:11px; color:var(--text-dim); line-height:1.6; }
+
+/* LoRA expanded blocks */
+.lora-board-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:48px; }
+
 /* ===== RESPONSIVE ===== */
 @media(max-width:1024px){
-  .overview-grid,.dual-grid,.cases-grid,.reflection-grid { grid-template-columns:1fr; }
+  .overview-grid { grid-template-columns:repeat(2,1fr); }
+  .dual-grid,.cases-grid,.reflection-grid { grid-template-columns:1fr; }
   .matrix-grid,.gallery-grid { grid-template-columns:repeat(2,1fr); }
   .inspo-grid { grid-template-columns:repeat(2,1fr); }
   .feedback-grid { grid-template-columns:1fr; }
   .inspo-intro,.feedback-intro { grid-template-columns:1fr; }
   .feedback-dims { grid-template-columns:repeat(2,1fr); }
+  .board-grid,.eval-grid { grid-template-columns:1fr; }
+  .lora-board-grid { grid-template-columns:1fr; }
   .loop-flow { gap:8px; }
   .loop-step { padding:12px 12px; }
   .section { padding:60px 24px; }
@@ -449,9 +489,10 @@ body {
   .hero-footer { left:24px; right:24px; flex-direction:column; gap:8px; }
 }
 @media(max-width:640px){
+  .overview-grid { grid-template-columns:1fr; }
   .matrix-grid,.gallery-grid { grid-template-columns:1fr; }
   .inspo-grid { grid-template-columns:1fr; }
-  .feedback-dims { grid-template-columns:1fr; }
+  .feedback-dims,.eval-grid { grid-template-columns:1fr; }
   .img-grid { grid-template-columns:repeat(2,1fr); }
 }
 </style>
@@ -500,16 +541,39 @@ body {
     <h2 class="sec-title">创意灵感采集<br>一切好模板的起点</h2>
     <p class="sec-desc">每一个 AI 玩法模板的诞生，都始于一次灵感的发散。在正式进入制作链路之前，我们会进行系统性的创意脑爆与视觉参考采集——从社媒趋势、影视美学、摄影风格、互动玩法等多维度寻找灵感锚点，确保每个模板不仅「视觉好看」，更「有可玩性」。</p>
   </div>
-  <div class="inspo-intro fade-up">
-    <div class="inspo-intro-text">
-      <strong>灵感来源：</strong>小红书趋势话题、影视摄影美学、时尚杂志构图、社媒互动玩法、游戏化叙事机制、节日热点与情绪共鸣点。<br><br>
-      <strong>采集维度：</strong>每张灵感板围绕「核心吸引力 → 用户心理 → 社交属性 → 传播钩子 → 可延展方向」五个维度进行分析，确保创意不止停留在视觉层面，而是具备可落地的产品化潜力。<br><br>
-      <strong>互动性思考：</strong>部分创意灵感也会探索更高自由度的互动玩法——例如让用户上传照片检测「你是哪位嫔妃」的位份测试，或加入橙光游戏式对话框，增加模板的参与感与传播力。
+  <div class="board-grid fade-up">
+    <div class="board-block">
+      <div class="bb-tag">SOURCE</div>
+      <h4>灵感来源</h4>
+      <ul>
+        <li>小红书趋势话题与社交热点</li>
+        <li>影视摄影美学与导演视觉语言</li>
+        <li>时尚杂志构图与色彩搭配</li>
+        <li>社媒互动玩法与传播机制</li>
+        <li>游戏化叙事与橙光式对话机制</li>
+        <li>节日热点与情绪共鸣节点</li>
+      </ul>
     </div>
-    <div>
-      <div class="inspo-tags">
-        <span>社媒趋势</span><span>影视美学</span><span>时尚摄影</span><span>互动玩法</span><span>游戏化叙事</span><span>节日热点</span><span>情绪共鸣</span><span>视觉参考</span>
-      </div>
+    <div class="board-block">
+      <div class="bb-tag">ANALYSIS</div>
+      <h4>采集维度</h4>
+      <ul>
+        <li>核心吸引力 — 用户第一眼为什么想玩</li>
+        <li>用户心理 — 满足了什么情绪需求</li>
+        <li>社交属性 — 生成结果适合分享吗</li>
+        <li>传播钩子 — 哪些元素驱动裂变</li>
+        <li>可延展方向 — 能否衍生更多变体</li>
+      </ul>
+    </div>
+    <div class="board-block">
+      <div class="bb-tag">INTERACTION</div>
+      <h4>互动性思考</h4>
+      <ul>
+        <li>测试类玩法：「你是哪位嫔妃」位份测试</li>
+        <li>叙事类玩法：橙光游戏式对话框</li>
+        <li>高自由度：让用户上传照片自由探索</li>
+        <li>参与感设计：降低门槛、提升传播力</li>
+      </ul>
     </div>
   </div>
   <div class="inspo-grid">
@@ -587,17 +651,29 @@ body {
     <p class="sec-desc">围绕「用户输入照片 → AI 生成风格化效果」核心链路，构建从创意灵感采集、模板生产、模型能力反馈到用户数据验证的完整闭环工作流。</p>
   </div>
   <div class="overview-grid">
-    <div class="overview-card fade-up stagger-1" onclick="scrollToSection('lora-detail')">
-      <div class="oc-num">WORK 01</div>
-      <h3>LoRA 插画风格训练集探索</h3>
-      <p>实习初期的快速上手任务，通过 AI 生成与风格筛选，完成插画师风格 LoRA 训练集素材构建，为后续 AIGC 图像风格控制建立基础认知。</p>
-      <div class="oc-tags"><span>风格一致性</span><span>训练集构建</span><span>批量生成</span></div>
+    <div class="overview-card fade-up stagger-1" onclick="scrollToSection('inspiration')">
+      <div class="oc-num">01</div>
+      <h3>创意灵感采集</h3>
+      <p>从社媒趋势、影视美学、互动玩法等多维度进行创意脑爆，为每个模板建立灵感锚点与可玩性基础。</p>
+      <div class="oc-tags"><span>趋势洞察</span><span>视觉参考</span><span>互动设计</span></div>
     </div>
     <div class="overview-card fade-up stagger-2" onclick="scrollToSection('gallery')">
-      <div class="oc-num">WORK 02</div>
-      <h3>腾讯元宝 AI 玩法模板效果设计</h3>
-      <p>围绕腾讯元宝端内用户与端外年轻化传播需求，持续产出可被用户复用的 AI 图片玩法模板。工作覆盖创意洞察、描述词设计、输入图控制、封面筛选、审美优化、热点响应与数据验证。</p>
+      <div class="oc-num">02</div>
+      <h3>AI 玩法模板效果设计</h3>
+      <p>围绕端内用户与端外传播需求，产出可复用的 AI 图片玩法模板，覆盖 8 大品类、89 个模板。</p>
       <div class="oc-tags"><span>Prompt 工程</span><span>双圈层运营</span><span>8 大品类</span></div>
+    </div>
+    <div class="overview-card fade-up stagger-3" onclick="scrollToSection('model-feedback')">
+      <div class="oc-num">03</div>
+      <h3>效果美学评估</h3>
+      <p>对混元等多模型进行系统性多维度评测，为模型生成能力升级提供审美方向与数据支撑。</p>
+      <div class="oc-tags"><span>多模型横评</span><span>六维打分</span><span>反馈闭环</span></div>
+    </div>
+    <div class="overview-card fade-up stagger-4" onclick="scrollToSection('lora-detail')">
+      <div class="oc-num">04</div>
+      <h3>LoRA 插画风格训练</h3>
+      <p>通过多主体场景适配与风格锚定验证，建立可跨场景复用的全局插画风格化能力。</p>
+      <div class="oc-tags"><span>风格一致性</span><span>训练集构建</span><span>批量验证</span></div>
     </div>
   </div>
   <!-- Work Cycle Loop Visualization -->
@@ -818,39 +894,69 @@ body {
     <h2 class="sec-title">效果美学评估<br>模型能力的审美校准</h2>
     <p class="sec-desc">在 AI 模板制作过程中，同步承担生图模型的效果美学反馈工作。通过系统性的多维度评测，为混元模型的生成能力升级提供审美方向与数据支撑。</p>
   </div>
-  <div class="feedback-intro fade-up">
-    <div class="feedback-intro-text">
-      <strong>评测对象：</strong>腾讯混元 vs GPT-4o vs Gemini 等多模型横向对比，针对同一描述词在不同模型下的生成结果进行效果美学评估。<br><br>
-      <strong>评估维度：</strong>每个生成结果从图文匹配度、结构准确性、美感质量三大核心维度进行打分，其中美感质量进一步细分为物形质量、色彩表现、环境氛围、构图关系、质感细节等子维度。<br><br>
-      <strong>反馈闭环：</strong>美学评估结果会直接反馈给模型团队，指导生图模型的优化方向——哪些风格表现更好、哪些结构需要强化、哪些色彩倾向需要调整。同时，模板上线后的用户数据也会反向验证评估标准的有效性，形成「模型评测 → 能力升级 → 用户验证 → 标准迭代」的完整闭环。
+  <div class="board-grid fade-up">
+    <div class="board-block">
+      <div class="bb-tag">TARGET</div>
+      <h4>评测对象</h4>
+      <ul>
+        <li>腾讯混元 — 内部生图模型</li>
+        <li>GPT-4o — OpenAI 图像生成</li>
+        <li>Gemini — Google 多模态模型</li>
+        <li>同 prompt 多模型横向对比</li>
+        <li>覆盖风格化、结构精准、美感等多场景</li>
+      </ul>
     </div>
-    <div>
-      <div class="feedback-dims">
-        <div class="feedback-dim">
-          <div class="fd-label">DIM 01</div>
-          <div class="fd-name">图文匹配度</div>
-        </div>
-        <div class="feedback-dim">
-          <div class="fd-label">DIM 02</div>
-          <div class="fd-name">结构准确性</div>
-        </div>
-        <div class="feedback-dim">
-          <div class="fd-label">DIM 03</div>
-          <div class="fd-name">物形质量</div>
-        </div>
-        <div class="feedback-dim">
-          <div class="fd-label">DIM 04</div>
-          <div class="fd-name">色彩表现</div>
-        </div>
-        <div class="feedback-dim">
-          <div class="fd-label">DIM 05</div>
-          <div class="fd-name">构图关系</div>
-        </div>
-        <div class="feedback-dim">
-          <div class="fd-label">DIM 06</div>
-          <div class="fd-name">质感细节</div>
-        </div>
-      </div>
+    <div class="board-block">
+      <div class="bb-tag">METHOD</div>
+      <h4>评估方法</h4>
+      <ul>
+        <li>图文匹配度 — prompt 与生成结果的一致性</li>
+        <li>结构准确性 — 人物/物体/空间关系正确度</li>
+        <li>美感质量 — 物形、色彩、构图、质感</li>
+        <li>逐条 prompt 验证，标注偏差与缺陷</li>
+      </ul>
+    </div>
+    <div class="board-block">
+      <div class="bb-tag">LOOP</div>
+      <h4>反馈闭环</h4>
+      <ul>
+        <li>美学评估结果直接反馈给模型团队</li>
+        <li>指导生图模型优化方向与风格调性</li>
+        <li>模板上线数据反向验证评估标准</li>
+        <li>模型评测 → 能力升级 → 用户验证 → 标准迭代</li>
+      </ul>
+    </div>
+  </div>
+  <div class="eval-grid fade-up">
+    <div class="eval-block">
+      <div class="eb-num">DIM 01</div>
+      <div class="eb-name">图文匹配度</div>
+      <div class="eb-desc">描述词与生成结果的语义对齐程度</div>
+    </div>
+    <div class="eval-block">
+      <div class="eb-num">DIM 02</div>
+      <div class="eb-name">结构准确性</div>
+      <div class="eb-desc">人物、物体、空间关系的合理性</div>
+    </div>
+    <div class="eval-block">
+      <div class="eb-num">DIM 03</div>
+      <div class="eb-name">物形质量</div>
+      <div class="eb-desc">生成物体的形态自然度与真实感</div>
+    </div>
+    <div class="eval-block">
+      <div class="eb-num">DIM 04</div>
+      <div class="eb-name">色彩表现</div>
+      <div class="eb-desc">色彩搭配的美观度与风格一致性</div>
+    </div>
+    <div class="eval-block">
+      <div class="eb-num">DIM 05</div>
+      <div class="eb-name">构图关系</div>
+      <div class="eb-desc">画面布局、主体位置与视觉平衡</div>
+    </div>
+    <div class="eval-block">
+      <div class="eb-num">DIM 06</div>
+      <div class="eb-name">质感细节</div>
+      <div class="eb-desc">材质纹理、光影效果与精细度</div>
     </div>
   </div>
   <div class="feedback-grid">
@@ -948,18 +1054,39 @@ body {
     <h2 class="sec-title">LoRA 插画风格训练集<br>全局风格化能力建设</h2>
     <p class="sec-desc">LoRA 训练集的核心目标不是「生成多少张图」，而是建立一套可跨场景复用的全局风格化能力。通过对人像、动物、风景、食物、静物等多类主体的系统性覆盖与验证，确保同一套插画风格能够稳定应用于不同内容类型，为后续 AIGC 模板的多样化产出提供风格基座。</p>
   </div>
-  <div class="overview-grid" style="margin-bottom:48px;">
-    <div class="overview-card fade-up stagger-1" style="cursor:default;">
-      <div class="oc-num">策略</div>
-      <h3>多主体场景适配</h3>
-      <p>训练集覆盖人像肖像、宠物动物、自然风光、食物饮品、静物装饰等五大主体类别。通过在不同内容类型上反复验证，确保风格不会因为主体切换而崩溃——无论是人物面部的细腻笔触，还是动物毛发的纹理表达，都能保持统一的插画师风格调性。</p>
-      <div class="oc-tags"><span>人像肖像</span><span>宠物动物</span><span>自然风光</span><span>食物饮品</span><span>静物装饰</span></div>
+  <div class="lora-board-grid fade-up">
+    <div class="board-block">
+      <div class="bb-tag">SCOPE</div>
+      <h4>多主体场景适配</h4>
+      <p>训练集覆盖五大主体类别，确保风格不会因主体切换而崩溃——无论是人物面部的细腻笔触，还是动物毛发的纹理表达，都能保持统一的插画师风格调性。</p>
+      <div class="oc-tags" style="margin-top:16px;"><span>人像肖像</span><span>宠物动物</span><span>自然风光</span><span>食物饮品</span><span>静物装饰</span></div>
     </div>
-    <div class="overview-card fade-up stagger-2" style="cursor:default;">
-      <div class="oc-num">方法</div>
-      <h3>风格锚定与批量验证</h3>
-      <p>采用「风格锚定 → 批量变体 → 配色打散排列」的三步工作法。先通过精选参考图确定插画师的核心风格特征（线条感、色彩倾向、构图习惯），再批量生成不同主体的变体图，最后通过配色打散排列验证风格在多元色彩组合下的稳定性与一致性。</p>
-      <div class="oc-tags"><span>风格锚定</span><span>批量变体</span><span>配色打散</span><span>稳定性验证</span></div>
+    <div class="board-block">
+      <div class="bb-tag">METHOD</div>
+      <h4>风格锚定与批量验证</h4>
+      <p>采用「风格锚定 → 批量变体 → 配色打散排列」三步工作法。先确定核心风格特征（线条感、色彩倾向、构图习惯），再批量生成不同主体的变体图，最后通过配色打散验证风格在多元色彩组合下的稳定性。</p>
+      <div class="oc-tags" style="margin-top:16px;"><span>风格锚定</span><span>批量变体</span><span>配色打散</span><span>稳定性验证</span></div>
+    </div>
+    <div class="board-block">
+      <div class="bb-tag">WORKFLOW</div>
+      <h4>训练集构建流程</h4>
+      <ul>
+        <li>精选参考图，锚定插画师核心风格特征</li>
+        <li>AI 批量生成不同主体的风格化图像</li>
+        <li>人工筛选高质量样本，剔除风格偏移项</li>
+        <li>配色打散排列，验证多元色彩下的一致性</li>
+        <li>跨主体交叉测试，确认风格通用性</li>
+      </ul>
+    </div>
+    <div class="board-block">
+      <div class="bb-tag">GOAL</div>
+      <h4>风格一致性验证</h4>
+      <ul>
+        <li>同一风格在不同主体上保持调性统一</li>
+        <li>线条感、色彩倾向、构图习惯可复现</li>
+        <li>为后续 AIGC 模板提供可复用的风格基座</li>
+        <li>降低新模板开发的风格调试成本</li>
+      </ul>
     </div>
   </div>
   <div class="img-grid" id="loraGrid"></div>
